@@ -74,6 +74,14 @@ public class LibrarianMenu  {
                 case 7:
                     Librarian();
                     break;
+                case 8:
+                    reservation.approveReservation();
+                    BookMenu();
+                    break;
+                case 9:
+                    reservation.rejectReservation();
+                    BookMenu();
+                    break;
                 default:
                     System.out.println("Invalid choice");
                     BookMenu();

@@ -8,8 +8,12 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import com.library.services.Borrow;
+import com.library.users.Admin;
 
 import static com.library.Layout.printTable;
+import static com.library.accounts.AccountManagement.getPatronIdFromLoggedInUser;
+import static com.library.accounts.AccountManagement.loggedInPatronUsername;
 
 public class Reservation {
     static Scanner sc = new Scanner(System.in);
@@ -23,53 +27,84 @@ public class Reservation {
     }
 
     public void doReservation() throws SQLException, SqlConnectionException {
+        Admin.viewBooks();
+
+        Borrow borrow = new Borrow();
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter the Book ID you want to reserve:");
-        int bookID = scanner.nextInt();
-        scanner.nextLine(); // Consume the newline
+        System.out.println("Enter the ISBN of the book to reserve:");
+        String isbnToReserve = scanner.nextLine();
 
         // Query to check if the book is available for reservation
-        String checkAvailabilityQuery = "SELECT COUNT(*) AS BookCount FROM finallibrary.Borrow WHERE BookID = ? AND Status = 'borrowed'";
+        String checkAvailabilityQuery = "SELECT BookID, Availability, Copies FROM finallibrary.Book WHERE ISBN = ?";
 
         try (Connection conn = DataBaseutils.getConnection();
              PreparedStatement checkAvailabilityStatement = conn.prepareStatement(checkAvailabilityQuery)) {
 
-            checkAvailabilityStatement.setInt(1, bookID);
+            checkAvailabilityStatement.setString(1, isbnToReserve);
             ResultSet availabilityResultSet = checkAvailabilityStatement.executeQuery();
 
-            // Check if the book is currently borrowed
-            if (availabilityResultSet.next() && availabilityResultSet.getInt("BookCount") == 0) {
-                // The book is available for reservation
-                System.out.println("Enter your Patron ID:");
-                int patronID = scanner.nextInt();
-                scanner.nextLine(); // Consume the newline
+            if (availabilityResultSet.next()) {
+                int bookID = availabilityResultSet.getInt("BookID");
+                String status = availabilityResultSet.getString("Availability");
+                int copies = availabilityResultSet.getInt("Copies");
 
-                // Now that you have bookID and patronID, you can proceed with the reservation
-                String insertReservationQuery = "INSERT INTO finallibrary.Reservation (ReservationID, ReservationDate, BookID, PatronID, Status) VALUES (finallibrary.reservation_seq.NEXTVAL, ?, ?, ?, 'requested')";
+                int patronID = getPatronIdFromLoggedInUser(loggedInPatronUsername);
+                if (patronID == -1) {
+                    System.out.println("No patron found with the logged-in username.");
+                    return; // Exit the method if no patron is found
+                }
 
+                // Check if the book is already reserved by this patron
+                String checkExistingReservationQuery = "SELECT COUNT(*) AS ReservationCount FROM finallibrary.Reservation WHERE BookID = ? AND PatronID = ? AND Status = 'requested'";
+                try (PreparedStatement checkExistingReservationStatement = conn.prepareStatement(checkExistingReservationQuery)) {
+                    checkExistingReservationStatement.setInt(1, bookID);
+                    checkExistingReservationStatement.setInt(2, patronID);
+                    ResultSet existingReservationResultSet = checkExistingReservationStatement.executeQuery();
+                    if (existingReservationResultSet.next() && existingReservationResultSet.getInt("ReservationCount") > 0) {
+                        System.out.println("You have already reserved this book.");
+                        return;
+                    }
+                }
+
+                // Proceed with the reservation
+                String insertReservationQuery = "INSERT INTO finallibrary.Reservation (ReservationID, ReservationDate, BookID, PatronID, Status) VALUES (finallibrary.reservation_seq.NEXTVAL, CURRENT_DATE, ?, ?, 'requested')";
                 try (PreparedStatement insertReservationStatement = conn.prepareStatement(insertReservationQuery)) {
-                    // Set parameters for the reservation insert statement
-                    insertReservationStatement.setDate(1, Date.valueOf(LocalDate.now()));
-                    insertReservationStatement.setInt(2, bookID);
-                    insertReservationStatement.setInt(3, patronID);
+                    insertReservationStatement.setInt(1, bookID);
+                    insertReservationStatement.setInt(2, patronID);
 
                     // Execute the reservation insert statement
                     int rowsInserted = insertReservationStatement.executeUpdate();
                     if (rowsInserted > 0) {
-                        System.out.println("Reservation added successfully!");
+                        System.out.println("Reservation requested successfully!");
+                        // If the book is available, update the status to 'reserved'
+                        if (status.equals("available") && copies > 0) {
+                            String updateBookStatusQuery = "UPDATE finallibrary.Book SET Availability = 'reserved' WHERE BookID = ?";
+                            try (PreparedStatement updateBookStatusStatement = conn.prepareStatement(updateBookStatusQuery)) {
+                                updateBookStatusStatement.setInt(1, bookID);
+                                updateBookStatusStatement.executeUpdate();
+                            }
+                        }
                     } else {
-                        System.out.println("Failed to add reservation.");
+                        System.out.println("Failed to request reservation.");
                     }
                 }
             } else {
-                System.out.println("The book is currently borrowed and cannot be reserved.");
+                System.out.println("No book found with the provided ISBN.");
             }
-
         } catch (SQLException e) {
             System.out.println("Error processing the reservation.");
             e.printStackTrace();
             throw e;
         }
+    }
+
+
+
+    public void notifyPatron(int patronID, String message) {
+        // Create a new notification task
+        NotificationTask notificationTask = new NotificationTask(patronID, message);
+        // Submit the task to the executor
+        executor.submit(notificationTask);
     }
 
     // Other methods...

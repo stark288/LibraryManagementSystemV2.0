@@ -363,7 +363,10 @@ public static void tableTopLayout() {
 		System.out.println("|      5. Search                                                |");
 		System.out.println("|      6. removeBook                                            |");
 		System.out.println("|      7. displayRequestedReservations                          |");
-		System.out.println("|      8. Go back to the previous menu                          |");
+		System.out.println("|      8. Approve Reservations                                  |");
+		System.out.println("|      9. reject Reservations                                   |");
+		System.out.println("|      0. Go back to the previous menu                         |");
+		System.out.println("|                                                               |");
 		System.out.println("|                                                               |");
 		System.out.println("------------------------------------------------------------------");
 	}
@@ -389,9 +392,7 @@ public static void tableTopLayout() {
 		}
 		for (String[] row : rows) {
 			for (int i = 0; i < row.length; i++) {
-				if (row[i] != null) {
-					widths[i] = Math.max(widths[i], row[i].length());
-				}
+				widths[i] = Math.max(widths[i], row[i].length());
 			}
 		}
 
@@ -416,6 +417,5 @@ public static void tableTopLayout() {
 		}
 		System.out.print(separator);
 	}
-
 
 }

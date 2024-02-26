@@ -167,7 +167,7 @@ public class Borrow {
         }
     }
 
-    private int getBookIdFromISBN(String isbn) throws SQLException, SqlConnectionException {
+    public int getBookIdFromISBN(String isbn) throws SQLException, SqlConnectionException {
         String sql = "SELECT BookID FROM finallibrary.Book WHERE ISBN = ?";
         try (Connection conn = DataBaseutils.getConnection();
              PreparedStatement statement = conn.prepareStatement(sql)) {
