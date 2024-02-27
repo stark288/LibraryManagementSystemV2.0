@@ -74,7 +74,7 @@ public class Borrow {
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 isReserved = true;
-            }
+            } 
         }
         return isReserved;
     }
@@ -92,6 +92,7 @@ public class Borrow {
         }
 
     }
+
     public void borrowBook() throws SQLException, SqlConnectionException {
         Admin.viewBooks();
 
@@ -116,6 +117,12 @@ public class Borrow {
         if (patronId == -1) {
             System.out.println("No patron found with the username: " + loggedInPatronUsername);
             return;
+        }
+
+        // Check if the patron has reserved the book
+        if (isPatronReservedBook(patronId, bookIdToBorrow)) {
+            System.out.println("You have a reservation for this book. Updating reservation status...");
+            Reservation.updateReservationStatus(bookIdToBorrow, patronId);
         }
 
         LocalDate borrowDate = LocalDate.now();
@@ -166,6 +173,7 @@ public class Borrow {
             throw e;
         }
     }
+
 
     public int getBookIdFromISBN(String isbn) throws SQLException, SqlConnectionException {
         String sql = "SELECT BookID FROM finallibrary.Book WHERE ISBN = ?";
@@ -219,9 +227,4 @@ public class Borrow {
 
         printTable(headers, rows);
     }
-
-
 }
-
-
-

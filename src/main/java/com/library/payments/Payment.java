@@ -156,11 +156,33 @@ public class Payment implements Payable{
             } else {
                 // Update the fine status in the Fine table
                 String updateFineSql = "UPDATE finallibrary.Fine SET Status = 'Paid' WHERE FineID = ?";
+                String paymentSql = "INSERT INTO finallibrary.Payment (PaymentID, PatronID, FineID, Amount, PaymentDate, PaymentMethod, Status) " +
+                "VALUES (finallibrary.payment_seq.NEXTVAL, ?, ?, ?, ?, ?, 'Completed')";
                 try (Connection conn = DataBaseutils.getConnection();
-                     PreparedStatement updateFineStmt = conn.prepareStatement(updateFineSql)) {
-                    updateFineStmt.setInt(1, fineId);
-                    updateFineStmt.executeUpdate();
-                }
+						PreparedStatement updateFineStmt = conn.prepareStatement(updateFineSql);
+						PreparedStatement paymentStmt = conn.prepareStatement(paymentSql)) {
+					// Start a transaction
+					conn.setAutoCommit(false);
+
+					// Insert payment record
+					paymentStmt.setInt(1, patronId);
+					paymentStmt.setInt(2, fineId);
+					paymentStmt.setDouble(3, amountPaid);
+					paymentStmt.setDate(4, Date.valueOf(java.time.LocalDate.now()));
+					paymentStmt.setString(5, "Cash"); // Assuming payment by cash for simplicity
+					paymentStmt.executeUpdate();
+
+					// Update fine status
+					updateFineStmt.setInt(1, fineId);
+					updateFineStmt.executeUpdate();
+
+					// Commit the transaction
+					conn.commit();
+				} catch (SQLException e) {
+					System.out.println("Error processing fine payment in the database.");
+					e.printStackTrace();
+					throw e;
+				}  
             }
         }
 

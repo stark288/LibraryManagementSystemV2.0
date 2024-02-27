@@ -1,52 +1,41 @@
 package com.library.services;
+
 import com.library.databaseservices.DataBaseutils;
 import com.library.exceptions.SqlConnectionException;
 
 import java.sql.*;
 import java.sql.Date;
-import java.time.LocalDate;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import com.library.services.Borrow;
-import com.library.users.Admin;
 
 import static com.library.Layout.printTable;
 import static com.library.accounts.AccountManagement.getPatronIdFromLoggedInUser;
 import static com.library.accounts.AccountManagement.loggedInPatronUsername;
 
 public class Reservation {
-    static Scanner sc = new Scanner(System.in);
+    private final TreeSet<String[]> reservations; // Store reservations sorted by Reservation ID
     private final Map<Integer, String> notifications; // Store notifications for each member
-    private final ExecutorService executor;
 
     public Reservation() {
-
+        this.reservations = new TreeSet<>(Comparator.comparing(arr -> Integer.parseInt(arr[0])));
         this.notifications = new HashMap<>();
-        this.executor = Executors.newCachedThreadPool(); // Create a thread pool
     }
 
     public void doReservation() throws SQLException, SqlConnectionException {
-        Admin.viewBooks();
-
-        Borrow borrow = new Borrow();
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter the ISBN of the book to reserve:");
         String isbnToReserve = scanner.nextLine();
 
-        // Query to check if the book is available for reservation
-        String checkAvailabilityQuery = "SELECT BookID, Availability, Copies FROM finallibrary.Book WHERE ISBN = ?";
+        // Query to check if the book exists in the database
+        String checkBookQuery = "SELECT BookID FROM finallibrary.Book WHERE ISBN = ?";
 
         try (Connection conn = DataBaseutils.getConnection();
-             PreparedStatement checkAvailabilityStatement = conn.prepareStatement(checkAvailabilityQuery)) {
+             PreparedStatement checkBookStatement = conn.prepareStatement(checkBookQuery)) {
 
-            checkAvailabilityStatement.setString(1, isbnToReserve);
-            ResultSet availabilityResultSet = checkAvailabilityStatement.executeQuery();
+            checkBookStatement.setString(1, isbnToReserve);
+            ResultSet bookResultSet = checkBookStatement.executeQuery();
 
-            if (availabilityResultSet.next()) {
-                int bookID = availabilityResultSet.getInt("BookID");
-                String status = availabilityResultSet.getString("Availability");
-                int copies = availabilityResultSet.getInt("Copies");
+            if (bookResultSet.next()) {
+                int bookID = bookResultSet.getInt("BookID");
 
                 int patronID = getPatronIdFromLoggedInUser(loggedInPatronUsername);
                 if (patronID == -1) {
@@ -76,14 +65,6 @@ public class Reservation {
                     int rowsInserted = insertReservationStatement.executeUpdate();
                     if (rowsInserted > 0) {
                         System.out.println("Reservation requested successfully!");
-                        // If the book is available, update the status to 'reserved'
-                        if (status.equals("available") && copies > 0) {
-                            String updateBookStatusQuery = "UPDATE finallibrary.Book SET Availability = 'reserved' WHERE BookID = ?";
-                            try (PreparedStatement updateBookStatusStatement = conn.prepareStatement(updateBookStatusQuery)) {
-                                updateBookStatusStatement.setInt(1, bookID);
-                                updateBookStatusStatement.executeUpdate();
-                            }
-                        }
                     } else {
                         System.out.println("Failed to request reservation.");
                     }
@@ -98,18 +79,26 @@ public class Reservation {
         }
     }
 
-
-
-    public void notifyPatron(int patronID, String message) {
-        // Create a new notification task
-        NotificationTask notificationTask = new NotificationTask(patronID, message);
-        // Submit the task to the executor
-        executor.submit(notificationTask);
+    public static void updateReservationStatus(int bookID, int patronID) throws SQLException, SqlConnectionException {
+        String sql = "UPDATE finallibrary.Reservation SET Status = 'borrowed' WHERE BookID = ? AND PatronID = ? AND Status = 'requested'";
+        try (Connection conn = DataBaseutils.getConnection();
+             PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setInt(1, bookID);
+            statement.setInt(2, patronID);
+            int rowsUpdated = statement.executeUpdate();
+            if (rowsUpdated > 0) {
+                System.out.println("Reservation status updated to 'borrowed' for book ID " + bookID);
+            } else {
+                System.out.println("Failed to update reservation status.");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error updating reservation status.");
+            e.printStackTrace();
+            throw e;
+        }
     }
 
-    // Other methods...
-
-    public static void approveReservation() throws SQLException, SqlConnectionException {
+    public void approveReservation() throws SQLException, SqlConnectionException {
         // Display requested reservations
         displayRequestedReservations();
 
@@ -119,125 +108,60 @@ public class Reservation {
             return;
         }
 
-        // Proceed with approval process
-        System.out.println("Enter reservation ID to approve: ");
-        String reservationID = sc.nextLine();
-        String sql = "UPDATE finallibrary.Reservation SET Status = 'approved' WHERE ReservationID = ?";
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter the Reservation ID to approve:");
+        int reservationID = sc.nextInt();
 
+        // Approve the selected reservation
+        String sql = "UPDATE finallibrary.Reservation SET Status = 'approved' WHERE ReservationID = ?";
         try (Connection conn = DataBaseutils.getConnection();
              PreparedStatement statement = conn.prepareStatement(sql)) {
-
-            statement.setString(1, reservationID);
-            int rowsAffected = statement.executeUpdate();
-
-            if (rowsAffected > 0) {
-                System.out.println("Reservation approved successfully.");
+            statement.setInt(1, reservationID);
+            int rowsUpdated = statement.executeUpdate();
+            if (rowsUpdated > 0) {
+                System.out.println("Reservation with ID " + reservationID + " has been approved.");
             } else {
-                System.out.println("No reservation found with the given ID.");
+                System.out.println("Failed to approve reservation.");
             }
         } catch (SQLException e) {
-            System.out.println("Error approving reservation in the database.");
+            System.out.println("Error approving reservation.");
             e.printStackTrace();
             throw e;
         }
     }
 
-    private static boolean noRequestedReservations() throws SQLException, SqlConnectionException {
-        // SQL query to count the total number of requested reservations
-        String sql = "SELECT COUNT(*) AS total FROM finallibrary.Reservation WHERE Status = 'requested'";
-
-        try (Connection conn = DataBaseutils.getConnection();
-             PreparedStatement statement = conn.prepareStatement(sql);
-             ResultSet resultSet = statement.executeQuery()) {
-
-            // Check if the result set has any data
-            if (resultSet.next()) {
-                // Get the total count of requested reservations from the result set
-                int totalReservations = resultSet.getInt("total");
-                // Return true if there are no requested reservations, false otherwise
-                return totalReservations == 0;
-            } else {
-
-                return true;
-            }
-        } catch (SQLException e) {
-            // Print error message and stack trace
-            System.out.println("Error checking requested reservations.");
-        }
-        return false;
-    }
-
-
-    public static void rejectReservation() throws SQLException, SqlConnectionException {
+    public void rejectReservation() throws SQLException, SqlConnectionException {
         // Display requested reservations
         displayRequestedReservations();
 
-        // Check if there are any reservations to approve
+        // Check if there are any reservations to reject
         if (noRequestedReservations()) {
             System.out.println("No reservations to reject.");
             return;
         }
 
-        // Proceed with approval process
-        System.out.println("Enter reservation ID to Reject: ");
-        String reservationID = sc.nextLine();
-        String sql = "UPDATE finallibrary.Reservation SET Status = 'Rejected' WHERE ReservationID = ?";
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter the Reservation ID to reject:");
+        int reservationID = sc.nextInt();
 
+        // Reject the selected reservation
+        String sql = "UPDATE finallibrary.Reservation SET Status = 'rejected' WHERE ReservationID = ?";
         try (Connection conn = DataBaseutils.getConnection();
              PreparedStatement statement = conn.prepareStatement(sql)) {
-
-            statement.setString(1, reservationID);
-            int rowsAffected = statement.executeUpdate();
-
-            if (rowsAffected > 0) {
-                System.out.println("Reservation Rejected .");
+            statement.setInt(1, reservationID);
+            int rowsUpdated = statement.executeUpdate();
+            if (rowsUpdated > 0) {
+                System.out.println("Reservation with ID " + reservationID + " has been rejected.");
             } else {
-                System.out.println("No reservation found with the given ID.");
+                System.out.println("Failed to reject reservation.");
             }
         } catch (SQLException e) {
-            System.out.println("Error approving reservation in the database.");
+            System.out.println("Error rejecting reservation.");
             e.printStackTrace();
             throw e;
         }
     }
-    public static void displayRequestedReservations() throws SQLException, SqlConnectionException {
-        String sql = "SELECT * FROM finallibrary.Reservation WHERE Status = 'requested'";
 
-        List<String[]> rows = new ArrayList<>();
-        String[] headers = {"Reservation ID", "Book ID", "Patron ID", "Reservation Date"};
-
-        try (Connection conn = DataBaseutils.getConnection();
-             PreparedStatement statement = conn.prepareStatement(sql);
-             ResultSet resultSet = statement.executeQuery()) {
-
-            if (!resultSet.isBeforeFirst()) {
-                System.out.println("No requested reservations available.");
-                return; // Exit the method early
-            }
-
-            while (resultSet.next()) {
-                String reservationID = String.valueOf(resultSet.getInt("ReservationID"));
-                String bookID = String.valueOf(resultSet.getInt("BookID"));
-                String patronID = String.valueOf(resultSet.getInt("PatronID"));
-                Date reservationDate = resultSet.getDate("ReservationDate");
-
-                String[] rowData = {
-                        reservationID,
-                        bookID,
-                        patronID,
-                        reservationDate.toString()
-                };
-                rows.add(rowData);
-            }
-        } catch (SQLException e) {
-            System.out.println("Error displaying requested reservations from the database.");
-        }
-
-        // Sort reservations by Reservation ID
-        rows.sort(Comparator.comparing(row -> Integer.parseInt(row[0])));
-
-        printTable(headers, rows);
-    }
     public void viewReservedBooks() throws SQLException, SqlConnectionException {
         // SQL query to retrieve reservation details along with the book name
         String sql = "SELECT r.ReservationID, r.ReservationDate, r.Status, r.BookID, b.Title AS BookName, r.PatronID, p.FirstName AS PatronName " +
@@ -275,11 +199,9 @@ public class Reservation {
             return;
         }
 
-        // Sort reservations by Reservation ID
-        Collections.sort(rows, Comparator.comparing(row -> Integer.parseInt(row[0])));
-
         printTable(headers, rows);
     }
+
     public void notifyMember(int patronID, String message) {
         synchronized (notifications) {
             notifications.put(patronID, message);
@@ -302,22 +224,64 @@ public class Reservation {
         System.out.println("Notifications cleared for patron ID " + patronID);
     }
 
-    public void shutdown() {
-        executor.shutdown();
+    public void displayRequestedReservations() throws SQLException, SqlConnectionException {
+        String sql = "SELECT * FROM finallibrary.Reservation WHERE Status = 'requested'";
+
+        List<String[]> rows = new ArrayList<>();
+        String[] headers = {"Reservation ID", "Book ID", "Patron ID", "Reservation Date"};
+
+        try (Connection conn = DataBaseutils.getConnection();
+             PreparedStatement statement = conn.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            if (!resultSet.isBeforeFirst()) {
+                System.out.println("No requested reservations available.");
+                return; // Exit the method early
+            }
+
+            while (resultSet.next()) {
+                String reservationID = String.valueOf(resultSet.getInt("ReservationID"));
+                String bookID = String.valueOf(resultSet.getInt("BookID"));
+                String patronID = String.valueOf(resultSet.getInt("PatronID"));
+                Date reservationDate = resultSet.getDate("ReservationDate");
+
+                String[] rowData = {
+                        reservationID,
+                        bookID,
+                        patronID,
+                        reservationDate.toString()
+                };
+                rows.add(rowData);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error displaying requested reservations from the database.");
+        }
+
+        printTable(headers, rows);
     }
 
-    private class NotificationTask implements Runnable {
-        private int patronID;
-        private String message;
+    private boolean noRequestedReservations() throws SQLException, SqlConnectionException {
+        // SQL query to count the total number of requested reservations
+        String sql = "SELECT COUNT(*) AS total FROM finallibrary.Reservation WHERE Status = 'requested'";
 
-        public NotificationTask(int patronID, String message) {
-            this.patronID = patronID;
-            this.message = message;
-        }
+        try (Connection conn = DataBaseutils.getConnection();
+             PreparedStatement statement = conn.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
 
-        @Override
-        public void run() {
-            System.out.println("Notification for patron ID " + patronID + ": " + message);
+            // Check if the result set has any data
+            if (resultSet.next()) {
+                // Get the total count of requested reservations from the result set
+                int totalReservations = resultSet.getInt("total");
+                // Return true if there are no requested reservations, false otherwise
+                return totalReservations == 0;
+            } else {
+                return true;
+            }
+        } catch (SQLException e) {
+            // Print error message and stack trace
+            System.out.println("Error checking requested reservations.");
+            e.printStackTrace();
         }
+        return false;
     }
 }

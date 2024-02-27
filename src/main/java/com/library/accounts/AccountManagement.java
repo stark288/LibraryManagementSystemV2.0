@@ -515,42 +515,39 @@ public class AccountManagement{
     }
 
     public static void viewLibrarians() throws SQLException, SqlConnectionException {
-        if (loggedInLibrarianUsername == null || loggedInLibrarianUsername.isEmpty()) {
-            System.out.println("No admin is currently logged in.");
-            return;
-        }
+    	 String sql = "SELECT * FROM finallibrary.Librarian";
 
-        String sql = "SELECT * FROM finallibrary.Librarian";
+    	    List<String[]> rows = new ArrayList<>();
+    	    String[] headers = {"Librarian ID", "First Name", "Last Name", "Phone", "Email","Accountstatus"};
 
-        List<String[]> rows = new ArrayList<>();
-        String[] headers = {"Librarian ID", "First Name", "Last Name", "Phone", "Email"};
+    	    try (Connection conn = DataBaseutils.getConnection();
+    	         Statement statement = conn.createStatement();
+    	         ResultSet resultSet = statement.executeQuery(sql)) {
 
-        try (Connection conn = DataBaseutils.getConnection();
-             Statement statement = conn.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)) {
+    	        if (!resultSet.isBeforeFirst()) {
+    	            System.out.println("No librarians found in the database.");
+    	            return;
+    	        }
 
-            if (!resultSet.isBeforeFirst()) {
-                System.out.println("No librarians found in the database.");
-                return;
-            }
-
-            while (resultSet.next()) {
-                String[] rowData = {
-                        resultSet.getString("LibrarianID"),
-                        resultSet.getString("FirstName"),
-                        resultSet.getString("LastName"),
-                        resultSet.getString("Phone"),
-                        resultSet.getString("Email")
-                };
-                rows.add(rowData);
-            }
-        } catch (SQLException e) {
-            System.out.println("Error viewing librarians from the database.");
-            e.printStackTrace();
-            return;
-        }
-        printTable(headers, rows);
-    }
+    	        while (resultSet.next()) {
+    	            String[] rowData = {
+    	                    resultSet.getString("LibrarianID"),
+    	                    resultSet.getString("FirstName"),
+    	                    resultSet.getString("LastName"),
+    	                    resultSet.getString("Phone"),
+    	                    resultSet.getString("Email"),
+    	                    resultSet.getString("Accountstatus")
+    	            };
+    	            rows.add(rowData);
+    	        }
+    	    } catch (SQLException e) {
+    	        System.out.println("Error viewing librarians from the database.");
+    	        e.printStackTrace();
+    	        return;
+    	    }
+    	    printTable(headers, rows);
+    	}
+    
 
     public void removeLibrarian() throws SQLException, SqlConnectionException {
         viewLibrarians();

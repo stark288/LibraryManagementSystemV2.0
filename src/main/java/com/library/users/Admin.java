@@ -604,15 +604,4 @@ public class Admin extends Person {
     }
 
 
-    public static void main(String[] args) throws SQLException, SqlConnectionException, InvalidDateFormatException {
-        Scanner sc = new Scanner(System.in);
-       //viewBooks();
-        //addBook();
-        //viewPolicies();
-        //viewAccounts();
-        //addLibrary();
-        //addAdmin();
-        //removeBook();
-        updateBook();
-    }
 }

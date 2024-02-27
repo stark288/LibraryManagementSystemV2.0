@@ -71,14 +71,14 @@ public class LibrarianMenu  {
                     reservation.displayRequestedReservations();
                     BookMenu();
                     break;
-                case 7:
+                case 9:
                     Librarian();
                     break;
-                case 8:
+                case 7:
                     reservation.approveReservation();
                     BookMenu();
                     break;
-                case 9:
+                case 8:
                     reservation.rejectReservation();
                     BookMenu();
                     break;

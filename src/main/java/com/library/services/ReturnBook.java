@@ -84,7 +84,8 @@ public class ReturnBook {
             String updateCopiesSql = "UPDATE finallibrary.Book SET Copies = Copies + 1 WHERE BookID = ?";
             try (PreparedStatement updateCopiesStmt = conn.prepareStatement(updateCopiesSql)) {
                 updateCopiesStmt.setInt(1, bookId);
-                updateCopiesStmt.executeUpdate();
+                int updatedRows = updateCopiesStmt.executeUpdate();
+                System.out.println("Updated " + updatedRows + " rows for book ID: " + bookId); // Debugging print
             }
 
             // Check for reservations
@@ -114,6 +115,7 @@ public class ReturnBook {
             }
 
             conn.commit(); // Commit transaction
+            System.out.println("Transaction committed successfully for book ID: " + bookId); // Debugging print
         } catch (SQLException e) {
             System.out.println("Error updating book copies and handling reservations.");
             e.printStackTrace();
@@ -173,9 +175,8 @@ public class ReturnBook {
             boolean isReturned = updateBorrowStatusAndPayFine(record.getBorrowId(), returnDate);
 
             // Update the number of copies and check for reservations
-            if (isReturned) {
+            if (!isReturned) {
                 updateBookCopiesAndHandleReservations(record.getBookId());
-
             }
         }
     }
