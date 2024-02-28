@@ -1,3 +1,7 @@
+/**
+ * Driver class is the main class of the library management system. It is the starting point of the program.
+ * @author SivaSankar C
+ */
 package com.library.driver;
 import com.library.Layout;
 import com.library.exceptions.*;
@@ -15,10 +19,12 @@ public class Driver {
     AccountManagement accountManagement = new AccountManagement();
     GuestMenu guestMenu = new GuestMenu();
     Layout layout = new Layout();
-
+    
+    /**
+     * This method is used to get the valid input from the user.
+     * @return the valid input from the user.
+     */
     Scanner sc = new Scanner(System.in);
-
-
     public int getValidInput()  {
         Scanner scanner = new Scanner(System.in);
         int choice = -1;
@@ -36,8 +42,10 @@ public class Driver {
 
         return choice;
     }
-
-
+    
+    /**
+     * This method is used to print the main menu and get the valid input from the user.
+     */
 
     public void mainmenu() throws SQLException, SqlConnectionException, InvalidDateFormatException, ValidPasswordExceptions, ValidemailExceptions {
         Layout.printHeader();
@@ -105,6 +113,9 @@ public class Driver {
                     mainmenu();
         }
     }
+    /**
+     * This is the main method which makes use of mainmenu method.
+     */
         public static void main (String[] args) throws SQLException, SqlConnectionException, InvalidDateFormatException, ValidPasswordExceptions, ValidemailExceptions{
             Driver driver = new Driver();
             driver.mainmenu();

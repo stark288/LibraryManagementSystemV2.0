@@ -1,5 +1,8 @@
 
-
+/**
+ * This class is responsible for managing the accounts of the library
+ * @author SivaSankar 
+ */
 package com.library.accounts;
 
 
@@ -29,6 +32,7 @@ public class AccountManagement{
     public static String loggedInLibrarianUsername;
     public static String loggedInPatronUsername;
     private static Scanner sc = new Scanner(System.in);
+    
     public void librarianLogin() throws SQLException, SqlConnectionException, InvalidDateFormatException, ValidPasswordExceptions, ValidemailExceptions {
         int loginAttempts = 0;
         final int MAX_LOGIN_ATTEMPTS = 3;
@@ -70,6 +74,11 @@ public class AccountManagement{
         Driver driver = new Driver();
         driver.mainmenu();
     }
+    /**
+     * This method is used to login as an admin
+     * @param username
+     * @param password
+     */
     public void adminLogin() throws SQLException, SqlConnectionException, InvalidDateFormatException, ValidPasswordExceptions, ValidemailExceptions {
         int loginAttempts = 0;
         final int MAX_LOGIN_ATTEMPTS = 3;
@@ -89,7 +98,7 @@ public class AccountManagement{
                 statement.setString(2, password);
                 ResultSet resultSet = statement.executeQuery();
                 if (resultSet.next()) {
-                    System.out.println("Login successful");
+                    System.out.println("Welcome, " + username + "!");
                     loggedInAdminUsername = username;
                     // Store the logged-in admin's username
                     // ... proceed with admin menu ...
@@ -112,6 +121,11 @@ public class AccountManagement{
         System.out.println("Maximum login attempts exceeded. Returning to the main menu.");
         // ... return to main menu ...
     }
+    /**
+     * This method is used to login as a patron
+     * @param username
+     * @param password
+     */
 
     public void patronLogin() throws SQLException, SqlConnectionException, InvalidDateFormatException, ValidPasswordExceptions, ValidemailExceptions {
         int loginAttempts = 0;
@@ -155,6 +169,10 @@ public class AccountManagement{
         driver.mainmenu();
 
     }
+    /**
+     * This method is used to register an admin
+     * @param admin
+     */
 
     public static void registerAdmin() throws SQLException, SqlConnectionException {
         String status = "active";
@@ -233,6 +251,11 @@ public class AccountManagement{
             }
         }
     }
+    /**
+     * This method is used to register a member
+     * @param member
+     * @return the member
+     */
     public void registerMember() throws SQLException, SqlConnectionException {
         Scanner scanner = new Scanner(System.in);
         String status = "active";
@@ -335,6 +358,11 @@ public class AccountManagement{
             }
         }
     }
+    
+    /**
+     * This method is used to get the last account id
+     * @return the last account id
+     */
 
     public void registerLibrarian() throws SQLException, SqlConnectionException {
         String firstName;
@@ -425,6 +453,11 @@ public class AccountManagement{
             }
         }
     }
+    /**
+     * This method is used to view the patron
+     * @return the patron details
+     * @throws SqlConnectionException
+     */
     public static void librarianviewpatron() throws SqlConnectionException {
         String sql = "SELECT * FROM finallibrary.Patron " +
                 "JOIN finallibrary.Accounts ON Patron.AccountID = Accounts.AccountID";
@@ -464,6 +497,10 @@ public class AccountManagement{
         printTable(headers, rows);
     }
 
+	/**
+	 * This method is used to view the patron
+	 * @param patron
+	 */
 
     public static void viewPatron() throws SqlConnectionException {
         if (loggedInPatronUsername == null || loggedInPatronUsername.isEmpty()) {
@@ -513,6 +550,10 @@ public class AccountManagement{
         }
         printTable(headers, rows);
     }
+    /**
+     * This method is used to view the librarian
+     * @return the librarian details
+     */
 
     public static void viewLibrarians() throws SQLException, SqlConnectionException {
     	 String sql = "SELECT * FROM finallibrary.Librarian";
@@ -549,6 +590,11 @@ public class AccountManagement{
     	}
     
 
+    /**
+     * This method is used to remove the librarian
+     * @throws SQLException
+     * @throws SqlConnectionException
+     */
     public void removeLibrarian() throws SQLException, SqlConnectionException {
         viewLibrarians();
         int attempts = 0;
@@ -727,6 +773,10 @@ public class AccountManagement{
 
 
 
+    /**
+     * @throws SQLException
+     * @throws SqlConnectionException
+     */
 
     public void updateMemberProfile() throws SQLException, SqlConnectionException {
         // Fetch the PatronID based on the logged-in patron's username
@@ -834,7 +884,12 @@ public class AccountManagement{
         }
     }
 
-
+  /**
+   * This method is used to view the admin
+   * @throws SQLException
+   * @throws SqlConnectionException
+   * @return the admin details
+   */
 
     public static void viewAdmin() throws SQLException, SqlConnectionException {
         if (loggedInAdminUsername == null || loggedInAdminUsername.isEmpty()) {
@@ -880,6 +935,11 @@ public class AccountManagement{
         printTable(headers, rows);
 
     }
+    /**
+     * This method is used to update the admin profile
+     * @param Username
+     * @return the admin details
+     */
 
 
     // Helper method to get the AdminID based on the username
@@ -899,6 +959,13 @@ public class AccountManagement{
             }
         }
     }
+    /**
+     * This method is used to print the table
+     * @param username
+     * @return the librarian id
+     * @throws SQLException
+     * @throws SqlConnectionException
+     */
 
     private int getLibrarianIdFromUsername(String username) throws SQLException, SqlConnectionException {
         String librarianIdQuery = "SELECT LibrarianID FROM finallibrary.Librarian " +
@@ -916,6 +983,13 @@ public class AccountManagement{
             }
         }
     }
+    /**
+     * This method is used to print the table
+     * @param loggedInPatronUsername
+     * @return the patron id
+     * @throws SQLException
+     * @throws SqlConnectionException
+     */
 
     public static int getPatronIdFromLoggedInUser(String loggedInPatronUsername) throws SQLException, SqlConnectionException {
         // Assuming loggedInPatronUsername holds the username of the currently logged-in patron
@@ -944,6 +1018,14 @@ public class AccountManagement{
 
         return patronId;
     }
+    /**
+     * This method is used to print the table
+     * @param adminID
+     * @param field
+     * @param conn
+     * @return the current field value
+     * @throws SQLException
+     */
     private String getCurrentFieldValue(int adminID, String field, Connection conn) throws SQLException {
         String sql = "SELECT " + field + " FROM finallibrary.Admins WHERE AdminID = ?";
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
@@ -957,6 +1039,15 @@ public class AccountManagement{
             }
         }
     }
+    /**
+     * This method is used to update the admin profile
+     * @param userID
+     * @param field
+     * @param table
+     * @param conn
+     * @return the current field value
+     * @throws SQLException
+     */
     private String getCurrentFieldValue(int userID, String field, String table, Connection conn) throws SQLException {
         String sql = "SELECT " + field + " FROM finallibrary." + table + " WHERE " + table + "ID = ?";
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
@@ -971,13 +1062,4 @@ public class AccountManagement{
         }
     }
 
-
-
-
-
-    public static void main(String[] args) throws SQLException, SqlConnectionException, InvalidDateFormatException, ValidPasswordExceptions, ValidemailExceptions {
-        //registerAdmin();
-
-        viewAdmin();
-    }
 }

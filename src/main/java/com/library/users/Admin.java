@@ -1,3 +1,7 @@
+/**
+ * This class is used to perform the operations of the Admin
+ * @author SivaSankar C
+ */
 package com.library.users;
 import com.library.accounts.*;
 import com.library.books.Book;
@@ -23,8 +27,6 @@ import java.io.*;
 import static com.library.Layout.printTable;
 import static com.library.validation.Validator.isValidEmail;
 
-//import static com.Library.Layout.BookLayout;
-//import static com.Library.Layout.tableBottomLayout;
 
 public class Admin extends Person {
     private int adminID;
@@ -50,7 +52,12 @@ public class Admin extends Person {
         
     }
 
-    // Establish a connection to the database
+    
+    /**
+     * This method is used to add a book to the library.
+     * @return the added book.
+     */
+     
     public static void addBook() throws SQLException, SqlConnectionException, InvalidDateFormatException {
         Date publishedDate = null;
         Scanner sc = new Scanner(System.in);
@@ -126,6 +133,10 @@ public class Admin extends Person {
         }
     }
 
+    /**
+     * This method is used to add a policy to the library.
+     * @return the added policy.
+     */
     public void addPolicy() {
         System.out.println("Open file to write policy");
         System.out.println("Enter policy to be added: ");
@@ -144,6 +155,10 @@ public class Admin extends Person {
         System.out.println("Policy added successfully");
     }
 
+    /**
+     * This method is used to add a library to the library.
+     * @return the added library.
+     */
 
     public static void addLibrary() throws SQLException, SqlConnectionException {
         Scanner scanner = new Scanner(System.in);
@@ -187,6 +202,10 @@ public class Admin extends Person {
             throw e;
         }
     }
+    /**
+     * This method is used to remove a book from the library.
+     * @return the removed book.
+     */
 
 
     public static void removeBook() throws SqlConnectionException {
@@ -222,6 +241,10 @@ public class Admin extends Person {
         System.out.println("Maximum attempts reached. Exiting removal process.");
     }
 
+	/**
+	 * This method is used to remove a policy from the library.
+	 * @return the removed policy.
+	 */
 
     public void removePolicy() {
         System.out.println("Enter policy to be removed: ");
@@ -235,6 +258,11 @@ public class Admin extends Person {
             System.out.println("Error removing policy from the database.");
         }
     }
+    
+	/**
+	 * This method is used to remove a library from the library.
+	 * @return the removed library.
+	 */
 
 
     public static void updateBook() throws SQLException, SqlConnectionException {
@@ -374,6 +402,12 @@ public class Admin extends Person {
         }
         System.out.println("Maximum attempts reached. Exiting update process.");
     }
+
+	/**
+	 * This method is used to update a policy from the library.
+	 * 
+	 * @return the updated policy.
+	 */
     public void updatePolicy() {
         System.out.println("Enter policy to be updated: ");
         String policy = sc.nextLine();
@@ -389,6 +423,12 @@ public class Admin extends Person {
         }
         System.out.println("Policy updated successfully");
     }
+
+	/**
+	 * This method is used to update a library from the library.
+	 * 
+	 * @return the updated library.
+	 */
     public static void updateLibrary() throws SQLException, SqlConnectionException {
         int attempts = 0;
         final int MAX_ATTEMPTS = 3;
@@ -427,6 +467,12 @@ public class Admin extends Person {
 
         }
     }
+
+	/**
+	 * This method is used to view the books in the library.
+	 * 
+	 * @return the books in the library.
+	 */
 
     public static void viewBooks() throws SQLException, SqlConnectionException {
         String sql = "SELECT * FROM finallibrary.Book";
@@ -475,6 +521,10 @@ public class Admin extends Person {
             throw e;
         }
     }
+    /**
+     * This method is used to view the policies in the library.
+     * @return the policies in the library.
+     */
     public static void viewPolicies() {
         try {
             File file = new File("C:\\Users\\gcs21\\OneDrive\\Desktop\\LibraryManagementSystem\\policy.txt");
@@ -489,6 +539,12 @@ public class Admin extends Person {
             System.out.println("Error viewing policies from the database.");
         }
     }
+
+	/**
+	 * This method is used to view the libraries in the library.
+	 * 
+	 * @return the libraries in the library.
+	 */
     public static void viewLibrary() throws SQLException, SqlConnectionException {
         String sql = "SELECT * FROM finallibrary.Library";
 
@@ -524,6 +580,11 @@ public class Admin extends Person {
         printTable(headers, rows);
     }
 
+	/**
+	 * This method is used to view the accounts in the library.
+	 * 
+	 * @return the accounts in the library.
+	 */
     public static void viewAccounts() throws SQLException, SqlConnectionException {
         String sql = "SELECT * FROM finallibrary.Accounts";
 
@@ -553,6 +614,10 @@ public class Admin extends Person {
         printTable(headers, rows);
     }
 
+    /**
+     * This method is used to view the feedback in the library.
+     * @return the feedback in the library.
+     */
     public void viewFeedback() throws SQLException, SqlConnectionException {
         String sql = "SELECT * FROM finallibrary.Feedback";
 
@@ -582,12 +647,11 @@ public class Admin extends Person {
         printTable(headers, rows);
     }
 
-
-
-
-
-
-
+	/**
+	 * This method is used to view the reservations in the library.
+	 * 
+	 * @return the reservations in the library.
+	 */
     private static int getAdminId() throws SqlConnectionException {
         String sql = "SELECT AdminID FROM finallibrary.Admins";
         try (Connection conn = DataBaseutils.getConnection();
@@ -599,7 +663,7 @@ public class Admin extends Person {
         } catch (SQLException e) {
             System.out.println("Error fetching manager ID from the database.");
             e.printStackTrace();
-        }
+            throw new RuntimeException(e);   }
         return getAdminId();
     }
 

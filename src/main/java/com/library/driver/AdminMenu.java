@@ -1,3 +1,7 @@
+/**
+ * This class is used to perform the operations of the Admin Menu
+ * @author SivaSankar 
+ */
 package com.library.driver;
 
 import com.library.Layout;
@@ -25,6 +29,16 @@ public class AdminMenu {
    Patron patron = new Patron();
 
     Scanner sc = new Scanner(System.in);
+
+	/**
+	 * This method is used to perform the actions of the Admin Menu.
+	 * 
+	 * @throws SQLException
+	 * @throws SqlConnectionException
+	 * @throws InvalidDateFormatException
+	 * @throws ValidPasswordExceptions
+	 * @throws ValidemailExceptions
+	 */
     public void BookActions() throws SQLException, SqlConnectionException, InvalidDateFormatException, ValidPasswordExceptions, ValidemailExceptions {
 
         layout.printAdminBookMenuOptions();
@@ -63,6 +77,14 @@ public class AdminMenu {
         }
     }
 
+    /**
+     * This method is used to perform the actions of the Librarian Menu.
+     * @throws SQLException
+     * @throws SqlConnectionException
+     * @throws InvalidDateFormatException
+     * @throws ValidPasswordExceptions
+     * @throws ValidemailExceptions
+     */
     public void LibrarianActions() throws SQLException, SqlConnectionException, InvalidDateFormatException, ValidPasswordExceptions, ValidemailExceptions {
         layout.printAdminLibrarianMenuOptions();
 
@@ -96,6 +118,14 @@ public class AdminMenu {
         }
 
     }
+    /**
+     * This method is used to perform the actions of the Library Menu.
+     * @throws SQLException
+     * @throws SqlConnectionException
+     * @throws InvalidDateFormatException
+     * @throws ValidPasswordExceptions
+     * @throws ValidemailExceptions
+     */
 
     public void LibraryActions() throws SQLException, SqlConnectionException, InvalidDateFormatException, ValidPasswordExceptions, ValidemailExceptions {
         layout.ptintLibraryManagementMenuOptions();
@@ -124,6 +154,14 @@ public class AdminMenu {
                 LibraryActions();
         }
     }
+    /**
+     * 
+     * @throws SQLException
+     * @throws SqlConnectionException
+     * @throws InvalidDateFormatException
+     * @throws ValidPasswordExceptions
+     * @throws ValidemailExceptions
+     */
     public void AdminActions() throws SQLException, SqlConnectionException, InvalidDateFormatException, ValidPasswordExceptions, ValidemailExceptions {
         layout.AdminManagement();
 
@@ -135,7 +173,7 @@ public class AdminMenu {
                 AdminActions();
                 break;
 
-            case 3:
+            case 2:
                 Admin();
                 break;
             default:
@@ -143,6 +181,14 @@ public class AdminMenu {
                 AdminActions();
         }
     }
+    /**
+     * 
+     * @throws SQLException
+     * @throws SqlConnectionException
+     * @throws InvalidDateFormatException
+     * @throws ValidPasswordExceptions
+     * @throws ValidemailExceptions
+     */
 
     public void viewservices() throws SQLException, SqlConnectionException, InvalidDateFormatException, ValidPasswordExceptions, ValidemailExceptions {
         printServicesMenuOptions();
@@ -167,13 +213,24 @@ public class AdminMenu {
                 break;
             case 4:
                 borrow.viewBorrows();
-                Admin();
+                viewservices();
+                break;
+                case 5:
+                	Admin();
             default:
                 System.out.println("Invalid choice");
                 viewservices();
         }
     }
 
+    /**
+     * 
+     * @throws SQLException
+     * @throws SqlConnectionException
+     * @throws InvalidDateFormatException
+     * @throws ValidPasswordExceptions
+     * @throws ValidemailExceptions
+     */
     public void manageLibraryPolicies() throws SQLException, SqlConnectionException, InvalidDateFormatException, ValidPasswordExceptions, ValidemailExceptions{
         layout.policymanagement();
         int choice =driver. getValidInput();
@@ -209,6 +266,13 @@ public class AdminMenu {
         }
 
     }
+    /**
+     * @throws SQLException
+     * @throws SqlConnectionException
+     * @throws InvalidDateFormatException
+     * @throws ValidPasswordExceptions
+     * @throws ValidemailExceptions
+     */
 
     public void Admin() throws SQLException, SqlConnectionException, InvalidDateFormatException, ValidPasswordExceptions, ValidemailExceptions{
         layout.Admin();

@@ -1,8 +1,16 @@
+/**
+ * This class is used to print the layout of the application.
+ * @author SivaSankar C
+ */
 package com.library;
 
 import java.util.List;
 
 public class Layout {
+	/**
+	 * This method is used to print the header of the application.
+     */
+	 
 	public static void printHeader() {
 		System.out.println("------------------------------------------------------------------");
 		System.out.println("******************************************************************");
@@ -12,6 +20,10 @@ public class Layout {
 		System.out.println("******************************************************************");
 		System.out.println("------------------------------------------------------------------");
 	}
+	/**
+	 * This method is used to print the main menu of the application.
+     */
+	 
 
 	public static void printMenuOptions() {
 		System.out.println("------------------------------------------------------------------");
@@ -26,6 +38,9 @@ public class Layout {
 		System.out.println("------------------------------------------------------------------");
 	}
 
+	/**
+	 * This method is used to print the admin menu of the application.
+	 */
 	public static void printAdminMenuOptions() {
 		System.out.println("------------------------------------------------------------------");
 		System.out.println("|                                                                |");
@@ -40,6 +55,10 @@ public class Layout {
 	}
 
 
+	/**
+	 * This method is used to print the patron menu of the application.
+     */
+	 
 	public static void printPatronMenuOptions() {
 		System.out.println("------------------------------------------------------------------");
 		System.out.println("|                                                                |");
@@ -52,7 +71,10 @@ public class Layout {
 		System.out.println("|                                                                |");
 		System.out.println("------------------------------------------------------------------");
 	}
-
+/**
+ * This method is used to print the admin menu of the application.
+ */
+ 
 	public static void printLibrarianMenuOptions() {
 		System.out.println("------------------------------------------------------------------");
 		System.out.println("|                                                                |");
@@ -67,6 +89,9 @@ public class Layout {
 		System.out.println("------------------------------------------------------------------");
 	}
 
+	/**
+     * This method is used to print the library menu of the application.
+     */
 	public static void printLibraryMenuOptions() {
 		System.out.println("------------------------------------------------------------------");
 		System.out.println("|                                                                |");
@@ -81,6 +106,10 @@ public class Layout {
 	}
 
 
+	/**
+	 * This method is used to print the guest menu of the application.
+     */
+	 
 	public static void printGuestMenuOptions() {
 		System.out.println("------------------------------------------------------------------");
 		System.out.println("|                                                                |");
@@ -93,6 +122,9 @@ public class Layout {
 		System.out.println("------------------------------------------------------------------");
 	}
 
+	/**
+     * This method is used to print the search menu of the application.
+     */
 
 
 	public static void printServicesMenuOptions() {
@@ -114,6 +146,9 @@ public class Layout {
 
 
 
+	/**
+     * This method is used to print the admin menu of the application.
+     */
 
 
 	public  static void AdminManagement(){
@@ -123,15 +158,15 @@ public class Layout {
 		System.out.println("|                    Choose an Option:                           |");
 		System.out.println("|                                                                |");
 		System.out.println("|      1. Add Admin                                              |");
-		System.out.println("|      2. Remove Admin                                           |");
-		System.out.println("|      3. Update Admin Profile                                   |");
-		System.out.println("|      4. View Policies                                          |");
-		System.out.println("|      5. Go back to the previous menu                           |");
+		System.out.println("|      2. Go back to the previous menu                           |");
 		System.out.println("|                                                                |");
 		System.out.println("------------------------------------------------------------------");
 
 	}
 
+	/**
+     * This method is used to print the user management menu of the application.
+     */
 	public static void usermanagement() {
 		System.out.println("------------------------------------------------------------------");
 		System.out.println("|                    User Management                             |");
@@ -144,6 +179,9 @@ public class Layout {
 		System.out.println("------------------------------------------------------------------");
 	}
 
+	/**
+     * This method is used to print the notification menu of the application.
+     */
 	public static void printNotificationMenuOptions() {
 		System.out.println("------------------------------------------------------------------");
 		System.out.println("|                                                                |");
@@ -155,6 +193,9 @@ public class Layout {
 		System.out.println("------------------------------------------------------------------");
 	}
 
+	/**
+     * This method is used to print the fine menu of the application.
+     */
 
 	public static void printFineMenuOptions() {
 		System.out.println("------------------------------------------------------------------");
@@ -169,6 +210,9 @@ public class Layout {
 	}
 
 
+	/**
+     * This method is used to print the feedback menu of the application.
+     */
 	public static void policymanagement(){
 		System.out.println("------------------------------------------------------------------");
 		System.out.println("|                    Policy Management                           |");
@@ -185,6 +229,9 @@ public class Layout {
 	}
 
 
+	/**
+     * This method is used to print the payment menu of the application.
+     */
 	public static void printPaymentMenuOptions() {
 		System.out.println("------------------------------------------------------------------");
 		System.out.println("|                                                                |");
@@ -196,6 +243,10 @@ public class Layout {
 		System.out.println("|                                                                |");
 		System.out.println("------------------------------------------------------------------");
 	}
+	
+	/**
+     * This method is used to print the admin menu of the application.
+     */
 
 	public static void printAdminBookMenuOptions() {
 		System.out.println("------------------------------------------------------------------");
@@ -212,6 +263,10 @@ public class Layout {
 		System.out.println("------------------------------------------------------------------");
 	}
 
+	/**
+	 * This method is used to print the admin menu of the application.
+     */
+	 
 	public static void printAdminLibrarianMenuOptions() {
 		System.out.println("------------------------------------------------------------------");
 		System.out.println("|                    Librarian Management                        |");
@@ -226,6 +281,9 @@ public class Layout {
 		System.out.println("------------------------------------------------------------------");
 	}
 
+	/**
+     * This method is used to print the admin menu of the application.
+     */
 
 	public static void printAdminMembershipMenuOptions() {
 		System.out.println("------------------------------------------------------------------");
@@ -240,6 +298,9 @@ public class Layout {
 		System.out.println("------------------------------------------------------------------");
 	}
 
+	/**
+     * This method is used to print the librarian menu of the application.
+     */
 	public static void theEnd() {
 		System.out.println("------------------------------------------------------------------");
 		System.out.println("******************************************************************");
@@ -250,6 +311,10 @@ public class Layout {
 		System.out.println("------------------------------------------------------------------");
 	}
 
+	/**
+     * This method is used to print the librarian menu of the application.
+     */
+	
 	public static void ptintLibraryManagementMenuOptions() {
 		System.out.println("------------------------------------------------------------------");
 		System.out.println("|                    Library Management                          |");
@@ -262,6 +327,10 @@ public class Layout {
 		System.out.println("|                                                                |");
 		System.out.println("------------------------------------------------------------------");
 	}
+	
+	/**
+     * This method is used to print the admin menu of the application.
+     */
 
 
 	public static void Admin() {
@@ -279,6 +348,10 @@ public class Layout {
 		System.out.println("|                                                                |");
 		System.out.println("------------------------------------------------------------------");
 	}
+	
+	/**
+     * This method is used to print the profile menu of the application.
+     */
 
 	public static void Membermenu() {
 		System.out.println("------------------------------------------------------------------");
@@ -292,6 +365,11 @@ public class Layout {
 	}
 
 
+	/**
+	 * 
+     * This method is used to print the service menu of the application.
+     */
+	 
 
 	public static void servicemenu() {
 		System.out.println("------------------------------------------------------------------");
@@ -309,6 +387,10 @@ public class Layout {
 		System.out.println("------------------------------------------------------------------");
 
 	}
+	/**
+	 * This method is used to print the search menu of the application.
+     *
+	 */
 
 	public void searchoption(){
 		System.out.println("------------------------------------------------------------------");
@@ -336,7 +418,11 @@ public static void tableTopLayout() {
 	public static void tableMiddleLayout() {
 		System.out.println("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 	}
-
+   
+	/**
+	 * This method is used to print the patron menu of the application.
+	 */
+	
 
 	public static void PatronMenu(){
         System.out.println("------------------------------------------------------------------");
@@ -350,6 +436,10 @@ public static void tableTopLayout() {
 		System.out.println("------------------------------------------------------------------");
 
 	}
+	/**
+	 * 	This method is used to print the book menu of the application.
+     */
+	 
 
 	public static void BookMenu(){
 		System.out.println("------------------------------------------------------------------");
@@ -369,6 +459,11 @@ public static void tableTopLayout() {
 		System.out.println("|                                                               |");
 		System.out.println("------------------------------------------------------------------");
 	}
+	/**
+	 * 
+     * This method is used to print the librarian menu of the application.
+     */
+	 
 	public static void LibrarianMenu(){
 		System.out.println("------------------------------------------------------------------");
 		System.out.println("|                    Librarian Menu                              |");
@@ -382,6 +477,11 @@ public static void tableTopLayout() {
 
 	}
 
+	/**
+	 * This method is used to print the table with headers and rows.
+	 * @param headers
+	 * @param rows
+	 */
 
 	public static void printTable(String[] headers, List<String[]> rows) {
 		// Calculate column widths

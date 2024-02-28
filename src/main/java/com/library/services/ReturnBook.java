@@ -1,3 +1,7 @@
+/**
+ * This class is used to return the book
+ * @author SivaSankar
+ */
 package com.library.services;
 
 import com.library.databaseservices.DataBaseutils;
@@ -15,6 +19,12 @@ import java.util.Scanner;
 import static com.library.accounts.AccountManagement.*;
 
 public class ReturnBook {
+	
+	/**
+	 * This method is used to return the book
+	 * @param borrowId
+     * @return true if the borrow is valid
+	 */
 
 
     private boolean isBorrowValid(int borrowId) throws SQLException, SqlConnectionException {
@@ -27,6 +37,12 @@ public class ReturnBook {
             }
         }
     }
+    /**
+     * This method is used to update the borrow status and pay the fine
+     * @param borrowId
+     * @param returnDate
+     * @return	true if the borrow status is updated and fine is paid
+     */
 
     private boolean updateBorrowStatusAndPayFine(int borrowId, LocalDate returnDate) throws SQLException, SqlConnectionException {
         // Update the borrow status to 'returned'
@@ -49,6 +65,11 @@ public class ReturnBook {
         return false;
     }
 
+    /**
+     * This method is used to update the book copies and handle the reservations
+     * @param bookId
+     * @return	true if the book copies are updated and the reservations are handled
+     */
 
     // BorrowRecord class to hold borrow ID and book name
     private class BorrowRecord {
@@ -74,7 +95,12 @@ public class ReturnBook {
             return bookId;
         }
     }
-
+ 
+    /**
+     * This method is used to update the book copies and handle the reservations
+     * @param bookId
+     * @return	true if the book copies are updated and the reservations are handled
+     */
 
     private void updateBookCopiesAndHandleReservations(int bookId) throws SQLException, SqlConnectionException {
         try (Connection conn = DataBaseutils.getConnection()) {
@@ -124,6 +150,11 @@ public class ReturnBook {
     }
 
 
+    /**
+     * This method is used to get the book id by the patron username
+     * @param username
+     * @return the list of book id
+     */
 
     public List<Integer> getBookIdsByPatronUsername(String username) throws SQLException, SqlConnectionException {
         List<Integer> bookIds = new ArrayList<>();
@@ -145,6 +176,11 @@ public class ReturnBook {
         }
         return bookIds;
     }
+    /**
+     * This method is used to return the book
+     * @param username
+     * @return    true if the book is returned
+     */
     public void returnBook() throws SQLException, SqlConnectionException, InvalidDateFormatException, ValidPasswordExceptions, ValidemailExceptions {
         int patronId = getPatronIdFromLoggedInUser(loggedInPatronUsername);
         if (patronId == -1) {
@@ -181,6 +217,12 @@ public class ReturnBook {
         }
     }
 
+    /**
+     * This method is used to notify the patron about the availability of the book
+     * @param patronId
+     * @param bookId
+     * @return	true if the patron is notified about the availability of the book
+     */
     private void notifyPatron(int patronId, int bookId) {
         String bookName = getBookNameById(bookId);
         if (bookName != null) {
@@ -189,7 +231,11 @@ public class ReturnBook {
             System.out.println("Failed to send notification. Book name not found for book ID " + bookId);
         }
     }
-
+/**
+ * This method is used to get the book name by the book id
+ * @param bookId
+ * @return  the book name
+ */
     private String getBookNameById(int bookId) {
         String bookName = null;
         String sql = "SELECT Title FROM finallibrary.Book WHERE BookID = ?";
@@ -208,6 +254,11 @@ public class ReturnBook {
         return bookName;
     }
 
+    /**
+     * This method is used to get the active borrow records by the patron id
+     * @param patronId
+     * @return the list of active borrow records
+     */
 
     private List<BorrowRecord> getActiveBorrowRecordsByPatronId(int patronId) throws SQLException, SqlConnectionException {
         List<BorrowRecord> borrowRecords = new ArrayList<>();
@@ -228,6 +279,4 @@ public class ReturnBook {
         }
         return borrowRecords;
     }
-
-
 }
